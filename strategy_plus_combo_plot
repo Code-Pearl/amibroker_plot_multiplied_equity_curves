@@ -1,0 +1,33 @@
+// ================================================
+// 2 strategies + combined Plot
+// ================================================
+
+StartCash = 100000;
+
+// ---- Load strategy 1 ----
+eq1_raw = Foreign("~~~Equity_Strat3", "C");
+
+// ---- Load strategy 2 ----
+eq2_raw = Foreign("~~~Equity_Strat22", "C");
+
+// ---- Forward fill (replace Nulls with last known value) ----
+eq1 = eq1_raw;
+eq2 = eq2_raw;
+
+for (i = 1; i < BarCount; i++)
+{
+    if (IsNull(eq1[i])) eq1[i] = eq1[i-1];
+    if (IsNull(eq2[i])) eq2[i] = eq2[i-1];
+}
+
+// ---- Normalize both to StartCash at bar 0 ----
+eq1 = eq1 / eq1[0] * StartCash;
+eq2 = eq2 / eq2[0] * StartCash;
+
+// ---- Combined = simple average ----
+Combined = (eq1 + eq2) / 2;
+
+// ---- Plot ----
+Plot(eq1,      "Strategy 1",  colorBlue,        styleLine);
+Plot(eq2,      "Strategy 2",  colorBrightGreen,  styleLine);
+Plot(Combined, "Combined",    colorWhite,        styleLine | styleThick);
